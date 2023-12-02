@@ -1,0 +1,129 @@
+{% extends 'apis/base.html' %}
+{#{% load print_timestamp %}#}
+{% block main_block %}
+    <div class="container-fluid p-4">
+        <div class="row m-0">
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mx-0 text-center">
+                            Number of Clients
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="mb-0">
+                            {{ clients.items }}
+                        </h1>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mx-0 text-center">
+                            Number of Sites
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="mb-0">
+                            {{ sites.count }}
+                        </h1>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mx-0 text-center">
+                            Number of Plans
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="mb-0">
+
+                        </h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-4 overflow-scroll">
+                <table class="table table-striped">
+                    <thead>
+                    <th>Client</th>
+                    <th>Plan Type</th>
+                    <th>Token</th>
+                    <th>Token Validity</th>
+                    </thead>
+                    <tbody>
+                    {% for client in clients %}
+                        <tr>
+                            <td>
+                                {{ client.username }}
+                            </td>
+{#                            <td>{{ client.email }}</td>#}
+                            {% for plan in client.client_plans %}
+                                <td>{{ plan.plan_id }}</td>
+                            {% endfor %}
+                            {% for token in client.user_tokens %}
+                                <td>{{ token.user_token }}</td>
+                                <td>{{ token.valid_till }}</td>
+                            {% endfor %}
+
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-8 overflow-scroll">
+                <table class='table table-striped' id='sites'>
+                    <thead>
+                    <tr>
+                        <th>Site Name</th>
+                        <th>Client Name</th>
+                        <th>Site Type</th>
+                        <th>Site Lat</th>
+                        <th>Site Lon</th>
+                        <th class='text-center'>Site Verified</th>
+                        <th>Site Status</th>
+                        <th>Update</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for site in sites %}
+                        <tr>
+                            <td>
+                                {{ site.site_name }}
+                            </td>
+                            <td>
+                                {{ site.client_name }}
+                            </td>
+                            <td>
+                                {{ site.type }}
+                            </td>
+                            <td>
+                                {{ site.latitude }}
+                            </td>
+                            <td>
+                                {{ site.longitude }}
+                            </td>
+                            <td class='text-center'>
+                                <input type="checkbox" {% if site.verified == "VERIFIED" %} checked {% endif %}>
+                            </td>
+                            <td>
+                                {{ site.site_status }}
+                            </td>
+                            <td>
+                                <button class='btn btn-warning'>Update Site</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
