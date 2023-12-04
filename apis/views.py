@@ -29,8 +29,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import ClientsForm, SiteConfigForm, ClientPlansForm
 
 # import models
-from .models import Clients, SiteConfig, Plans, ClientPlans, UserTokens, VDbApi
-from .serializers import ClientAllSerializer, VBADataSerializer
+from .models import Clients, SiteConfig, Plans, ClientPlans, UserTokens, VDbApi, VWrfData
+from .serializers import ClientAllSerializer, VBADataSerializer, VWrfViewSerializer
 
 
 # Create your views here.
@@ -168,7 +168,7 @@ def premium(client):
     return data_serialize.data
 
 @api_view(['GET'])
-def api_view(request, token):
+def api_view_data(request, token):
     token_verification = verify_token(token=token)
     message = token_verification['message']
     data = None
@@ -189,10 +189,12 @@ def api_view(request, token):
 
 
 @api_view(['GET'])
-def api_view(request, token):
+def v_wrf_view(request, token):
     token_verification = verify_token(token=token)
     message = token_verification['message']
     data = None
+    api_date_start = None
+    api_date_end = None
     if token_verification['session_status'] != "Valid":
         print("The Session is Invalid")
         print(f"{message}")
@@ -202,8 +204,16 @@ def api_view(request, token):
         plan = token_verification['plan']
 
         if plan == 'Basic':
-            data = basic(client)
-            print(type(data))
+            api_date_start = datetime.now() + timedelta(days=1)
+            api_date_end = datetime.now() + timedelta(days=3)
+        
         elif plan == 'Premium':
-            data = premium(client)
-    return Response(data)
+            api_date_start = datetime.now()
+            api_date_end = datetime.now() + timedelta(days=3)
+        site_names = list(SiteConfig.objects.filter(client_name=client).values_list('site_name', flat=True))
+      
+        now_api = VWrfData.objects.filter(site_name__in=site_names,
+                                    timestamp__gte=api_date_start,
+                                    timestamp__lte=api_date_end).values()
+        data_serialize = VWrfViewSerializer(now_api, many=True)
+    return Response(data_serialize.data)

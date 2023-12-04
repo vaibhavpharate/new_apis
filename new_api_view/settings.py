@@ -114,6 +114,17 @@ DATABASES = {
         'PASSWORD': 'tensor123',
         'HOST': 'tensordb1.cn6gzof6sqbw.us-east-2.rds.amazonaws.com',
         'PORT': '5432',
+    },
+    "v_wrf_view": {
+        'ENGINE': 'django.db.backends.postgresql',
+        'OPTIONS': {
+            'options': f'-c search_path=td_wrf'
+        },
+        'NAME': 'postgres',
+        'USER': 'admin123',
+        'PASSWORD': 'tensor123',
+        'HOST': 'tensordb1.cn6gzof6sqbw.us-east-2.rds.amazonaws.com',
+        'PORT': '5432',
     }
 }
 
