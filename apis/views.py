@@ -85,7 +85,7 @@ def create_client(request):
             admin_group = Group.objects.get(name='Admin')
 
             # add client to their respective plans
-            plan_type_map = Plans.objects.filter(plan_type=plan_type).values('id')
+            plan_type_map = Plans.objects.filter(plan_type=plan_type).values('plan_type')
             token = None
             try:
                 user_id = Clients.objects.filter(username=user.username).values('id')
