@@ -167,17 +167,6 @@ def premium(client):
     data_serialize = VBADataSerializer(now_api, many=True)
     return data_serialize.data
 
-#
-# class PassthroughRenderer(renderers.BaseRenderer):
-#     """
-#         Return data as-is. View should supply a Response.
-#     """
-#     media_type = ''
-#     format = ''
-#     def render(self, data, accepted_media_type=None, renderer_context=None):
-#         return data
-
-# @action(methods=['get'], detail=True, renderer_classes=(PassthroughRenderer,))
 @api_view(['GET'])
 def api_view(request, token):
     token_verification = verify_token(token=token)
