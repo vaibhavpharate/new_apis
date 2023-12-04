@@ -144,7 +144,7 @@ def verify_token(token):
 def basic(client):
     api_date_start = datetime.now() + timedelta(days=1)
     api_date_end = datetime.now() + timedelta(days=3)
-    site_names = list(SiteConfig.objects.filter(client_name=client).values_list('site_name', flat=True))
+    site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
 
     # Getting the APIS data
     now_api = VDbApi.objects.filter(site_name__in=site_names,
@@ -159,7 +159,7 @@ def basic(client):
 def premium(client):
     api_date_start = datetime.now()
     api_date_end = datetime.now() + timedelta(days=3)
-    site_names = list(SiteConfig.objects.filter(client_name=client).values_list('site_name', flat=True))
+    site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
     # Getting the APIS data
     now_api = VDbApi.objects.filter(site_name__in=site_names,
                                     timestamp__gte=api_date_start,
@@ -210,7 +210,7 @@ def v_wrf_view(request, token):
         elif plan == 'Premium':
             api_date_start = datetime.now()
             api_date_end = datetime.now() + timedelta(days=3)
-        site_names = list(SiteConfig.objects.filter(client_name=client).values_list('site_name', flat=True))
+        site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
       
         now_api = VWrfData.objects.filter(site_name__in=site_names,
                                     timestamp__gte=api_date_start,
