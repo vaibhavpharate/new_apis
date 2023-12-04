@@ -117,3 +117,21 @@ class UserTokens(models.Model):
 
     def __str__(self) -> str:
         return self.user_token
+
+
+class VWrfData(models.Model):
+    site_name = models.TextField(blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    site_type = models.TextField(blank=True, null=True)
+    timestamp = models.DateTimeField(primary_key=True)
+    timezone = models.TextField(blank=True, null=True)
+    temp_c = models.FloatField(blank=True, null=True)
+    wind_speed_10m_mps = models.FloatField(blank=True, null=True)
+    wind_direction_in_deg = models.FloatField(blank=True, null=True)
+    swdown_wpm2 = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        # managed = False
+        unique_together = ('timestamp', 'site_name')
+        db_table = 'v_wrf_data'

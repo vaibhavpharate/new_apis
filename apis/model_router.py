@@ -1,4 +1,4 @@
-from .models import SiteConfig, VDbApi
+from .models import SiteConfig, VDbApi, VWrfData
 
 class MyDBRouter(object):
 
@@ -8,6 +8,8 @@ class MyDBRouter(object):
             return 'site_configs'
         elif model == VDbApi:
             return 'data_api'
+        elif model == VWrfData:
+            return 'v_wrf_view'
         return None
 
     def db_for_write(self, model, **hints):
@@ -16,5 +18,7 @@ class MyDBRouter(object):
             return 'site_configs'
         elif model == VDbApi:
             return 'data_api'
+        elif model == VWrfData:
+            return 'v_wrf_view'
         return None
 
