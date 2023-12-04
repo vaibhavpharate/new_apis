@@ -186,3 +186,24 @@ def api_view(request, token):
         elif plan == 'Premium':
             data = premium(client)
     return Response(data)
+
+
+@api_view(['GET'])
+def api_view(request, token):
+    token_verification = verify_token(token=token)
+    message = token_verification['message']
+    data = None
+    if token_verification['session_status'] != "Valid":
+        print("The Session is Invalid")
+        print(f"{message}")
+    else:
+
+        client = token_verification['client']
+        plan = token_verification['plan']
+
+        if plan == 'Basic':
+            data = basic(client)
+            print(type(data))
+        elif plan == 'Premium':
+            data = premium(client)
+    return Response(data)
