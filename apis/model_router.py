@@ -1,4 +1,4 @@
-from .models import SiteConfig, VDbApi, VWrfData
+from .models import SiteConfig, VDbApi, VWrfData, VWrfRevision
 
 class MyDBRouter(object):
 
@@ -8,7 +8,7 @@ class MyDBRouter(object):
             return 'site_configs'
         elif model == VDbApi:
             return 'data_api'
-        elif model == VWrfData:
+        elif model == VWrfData or model==VWrfRevision:
             return 'v_wrf_view'
         return None
 
@@ -18,7 +18,7 @@ class MyDBRouter(object):
             return 'site_configs'
         elif model == VDbApi:
             return 'data_api'
-        elif model == VWrfData:
+        elif model == VWrfData or model== VWrfRevision:
             return 'v_wrf_view'
         return None
 

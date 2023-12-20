@@ -1,1 +1,4 @@
 /env
+/apis/__pycache__
+/apis/migrations/__pycache__
+/new_api_view/__pycache__

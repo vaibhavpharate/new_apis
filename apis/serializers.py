@@ -1,5 +1,5 @@
 from rest_framework import serializers, viewsets
-from .models import VDbApi, ClientPlans, Clients, UserTokens, Plans, VWrfData
+from .models import VDbApi, ClientPlans, Clients, UserTokens, Plans, VWrfData, VWrfRevision
 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -47,3 +47,9 @@ class VWrfViewSerializer(serializers.ModelSerializer):
         model = VWrfData
         fields = "__all__"
 
+class VWrfRevisionSerializer(serializers.ModelSerializer):
+    timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+
+    class Meta:
+        model = VWrfRevision
+        fields = "__all__"

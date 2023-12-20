@@ -29,8 +29,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import ClientsForm, SiteConfigForm, ClientPlansForm
 
 # import models
-from .models import Clients, SiteConfig, Plans, ClientPlans, UserTokens, VDbApi, VWrfData
-from .serializers import ClientAllSerializer, VBADataSerializer, VWrfViewSerializer
+from .models import Clients, SiteConfig, Plans, ClientPlans, UserTokens, VDbApi, VWrfData, VWrfRevision
+from .serializers import ClientAllSerializer, VBADataSerializer, VWrfViewSerializer, VWrfRevisionSerializer
 
 
 # Create your views here.
@@ -61,11 +61,18 @@ def admin_home(request):
     clients = Clients.objects.filter(role_type='CLIENT').prefetch_related('user_tokens')
     clients = ClientAllSerializer(clients, many=True).data
     # clients = pd.DataFrame.from_records(clients)
-    print(type(clients))
+    # print(type(clients))
     plans = Plans.objects.all().values()
     site_configs = SiteConfig.objects.all().values()
     client_plans = ClientPlans.objects.all().values()
-    print(clients)
+    
+    # client_sample_name = "Kreate"
+    # gte = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")
+    # client_sites_sample = list(SiteConfig.objects.filter(client_name=client_sample_name).values_list('site_name',flat=True))
+    # v_wrf_revision = VWrfData.objects.filter(site_name__in=client_sites_sample).filter(timestamp__gte=gte).values()
+    # print(v_wrf_revision)
+    # print(clients)
+
     context = {'clients': clients, 'sites': site_configs, 'plans': plans, 'client_plans': client_plans}
     return render(request=request, template_name='apis/admin_home.html', context=context)
 
@@ -142,8 +149,9 @@ def verify_token(token):
 
 
 def basic(client):
-    api_date_start = datetime.now() + timedelta(days=1)
-    api_date_end = datetime.now() + timedelta(days=3)
+    ref_date = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+    api_date_start = ref_date + timedelta(days=1)
+    api_date_end = ref_date + timedelta(days=3)
     site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
 
     # Getting the APIS data
@@ -157,8 +165,8 @@ def basic(client):
 
 
 def premium(client):
-    api_date_start = datetime.now()
-    api_date_end = datetime.now() + timedelta(days=3)
+    api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+    api_date_end = api_date_start + timedelta(days=3)
     site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
     # Getting the APIS data
     now_api = VDbApi.objects.filter(site_name__in=site_names,
@@ -199,17 +207,18 @@ def v_wrf_view(request, token):
         print("The Session is Invalid")
         print(f"{message}")
     else:
-
         client = token_verification['client']
         plan = token_verification['plan']
-
         if plan == 'Basic':
-            api_date_start = datetime.now() + timedelta(days=1)
-            api_date_end = datetime.now() + timedelta(days=3)
+            ref_date = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+            api_date_start = ref_date + timedelta(days=1)
+            api_date_end = ref_date + timedelta(days=3)
+            # api_date_start = datetime.now() + timedelta(days=1)
+            # api_date_end = datetime.now() + timedelta(days=3)
         
         elif plan == 'Premium':
-            api_date_start = datetime.now()
-            api_date_end = datetime.now() + timedelta(days=3)
+            api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+            api_date_end = api_date_start + timedelta(days=3)
         site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
       
         now_api = VWrfData.objects.filter(site_name__in=site_names,
@@ -217,3 +226,30 @@ def v_wrf_view(request, token):
                                     timestamp__lte=api_date_end).values()
         data_serialize = VWrfViewSerializer(now_api, many=True)
     return Response(data_serialize.data)
+
+
+@api_view(['GET'])
+def v_wrf_view_alpha(request,token):
+    token_verification = verify_token(token=token)
+    message = token_verification['message']
+    data = None
+    api_date_start = None
+    api_date_end = None
+    if token_verification['session_status'] != "Valid":
+        print("The Session is Invalid")
+        print(f"{message}")
+    else:
+        client = token_verification['client']
+        plan = token_verification['plan']
+        site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
+        
+        api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+        now_api = VWrfRevision.objects.filter(site_name__in=site_names).filter(timestamp__gte=api_date_start).values()
+
+
+        data_serialize = VWrfRevisionSerializer(now_api,many=True)
+        return Response(data_serialize.data)
+
+
+
+    

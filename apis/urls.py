@@ -7,6 +7,7 @@ urlpatterns = [
     path('admin_login', admin_login, name='admin-login'),
     path('create_client', create_client, name='create_client'),
     path('api_view/<str:token>',api_view_data,name='api-view'),
-    path('v_wrf_view/<str:token>',v_wrf_view,name='v-wrf-view')
+    path('v_wrf_view/<str:token>',v_wrf_view,name='v-wrf-view'),
+    path('v_wrf_alpha/<str:token>',v_wrf_view_alpha,name='v_wrf_alpha')
 
 ]
