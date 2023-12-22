@@ -200,7 +200,7 @@ def api_view_data(request, token):
 def v_wrf_view(request, token):
     token_verification = verify_token(token=token)
     message = token_verification['message']
-    data = None
+    # data = None
     api_date_start = None
     api_date_end = None
     if token_verification['session_status'] != "Valid":
@@ -230,24 +230,28 @@ def v_wrf_view(request, token):
 def v_wrf_view_alpha(request,token):
     token_verification = verify_token(token=token)
     message = token_verification['message']
-    data = None
+    # data = None
     api_date_start = None
     api_date_end = None
     if token_verification['session_status'] != "Valid":
         print("The Session is Invalid")
         print(f"{message}")
+        return Response({'data':'Session is Invalid!S'})
     else:
         client = token_verification['client']
         plan = token_verification['plan']
-        site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
-        
-        api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
-        
-        now_api = VWrfRevision.objects.filter(site_name__in=site_names).filter(timestamp__gte=api_date_start).values()
-
-
-        data_serialize = VWrfRevisionSerializer(now_api,many=True)
-        return Response(data_serialize.data)
+        if plan == 'Premium':
+            site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
+            api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+            api_date_end = api_date_start + timedelta(days=3)
+            now_api = VWrfRevision.objects.filter(site_name__in=site_names,
+                                                timestamp__gte=api_date_start,
+                                                timestamp__lte=api_date_end).values()
+            data_serialize = VWrfRevisionSerializer(now_api,many=True)
+            return Response(data_serialize.data)
+        else:
+            return Response({'message':'This is a Premium Resource'})
+    
 
 
 
