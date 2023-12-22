@@ -213,8 +213,6 @@ def v_wrf_view(request, token):
             ref_date = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
             api_date_start = ref_date + timedelta(days=1)
             api_date_end = ref_date + timedelta(days=3)
-            # api_date_start = datetime.now() + timedelta(days=1)
-            # api_date_end = datetime.now() + timedelta(days=3)
         
         elif plan == 'Premium':
             api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
@@ -244,6 +242,7 @@ def v_wrf_view_alpha(request,token):
         site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
         
         api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+        
         now_api = VWrfRevision.objects.filter(site_name__in=site_names).filter(timestamp__gte=api_date_start).values()
 
 
