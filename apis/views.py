@@ -197,6 +197,36 @@ def api_view_data(request, token):
 
 
 @api_view(['GET'])
+def api_view_site(request,token,site_name):
+    token_verification = verify_token(token=token)
+    message = token_verification['message']
+    data = None
+    if token_verification['session_status'] != "Valid":
+        print("The Session is Invalid")
+        print(f"{message}")
+    else:
+        client = token_verification['client']
+        plan = token_verification['plan']
+        if plan == 'Basic':
+            ref_date = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+            api_date_start = ref_date + timedelta(days=1)
+            api_date_end = ref_date + timedelta(days=3)
+        
+        elif plan == 'Premium':
+            api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+            api_date_end = api_date_start + timedelta(days=3)
+        site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
+        if site_name not in site_names:
+                return Response({'message':'Site Not available in Site List','site_list':site_names})
+        now_api = VDbApi.objects.filter(site_name=site_name,
+                                    timestamp__gte=api_date_start,
+                                    timestamp__lte=api_date_end).values()
+        data_serialize = VBADataSerializer(now_api, many=True)
+    return Response(data_serialize.data)
+
+
+
+@api_view(['GET'])
 def v_wrf_view(request, token):
     token_verification = verify_token(token=token)
     message = token_verification['message']
@@ -255,4 +285,30 @@ def v_wrf_view_alpha(request,token):
 
 
 
-    
+@api_view(['GET'])
+def v_wrf_view_alph_site(request,token,site_name):
+    token_verification = verify_token(token=token)
+    message = token_verification['message']
+    # data = None
+    api_date_start = None
+    api_date_end = None
+    if token_verification['session_status'] != "Valid":
+        print("The Session is Invalid")
+        print(f"{message}")
+        return Response({'data':'Session is Invalid!S'})
+    else:
+        client = token_verification['client']
+        plan = token_verification['plan']
+        if plan == 'Premium':
+            site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
+            if site_name not in site_names:
+                return Response({'message':'Site Not available in Site List','site_list':site_names})
+            api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+            api_date_end = api_date_start + timedelta(days=3)
+            now_api = VWrfRevision.objects.filter(site_name = site_name,
+                                                timestamp__gte=api_date_start,
+                                                timestamp__lte=api_date_end).values()
+            data_serialize = VWrfRevisionSerializer(now_api,many=True)
+            return Response(data_serialize.data)
+        else:
+            return Response({'message':'This is a Premium Resource'})
