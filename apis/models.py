@@ -76,6 +76,24 @@ class SiteConfig(models.Model):
         return self.site_name
 
 
+class SiteConfig1(models.Model):
+    site_name = models.TextField(blank=True, null=True)
+    state = models.TextField(blank=True, null=True)
+    capacity = models.FloatField(blank=True, null=True)
+    type = models.TextField(blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    row_id = models.BigIntegerField(blank=True, null=True)
+    log_ts = models.DateTimeField(blank=True, null=True)
+    client_name = models.CharField(max_length=200, blank=True, null=True)
+    site_status = models.CharField(max_length=200, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'site_config_1'
+
+
+
 class ClientSiteConfigs(models.Model):
     client_id = models.ForeignKey(Clients, on_delete=models.CASCADE)
     site_id = models.ForeignKey(SiteConfig, on_delete=models.CASCADE)

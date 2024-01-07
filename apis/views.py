@@ -29,7 +29,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import ClientsForm, SiteConfigForm, ClientPlansForm
 
 # import models
-from .models import Clients, SiteConfig, Plans, ClientPlans, UserTokens, VDbApi, VWrfData, VWrfRevision
+from .models import Clients, SiteConfig, Plans, ClientPlans, UserTokens, VDbApi, VWrfData, VWrfRevision, SiteConfig1
 from .serializers import ClientAllSerializer, VBADataSerializer, VWrfViewSerializer, VWrfRevisionSerializer
 
 
@@ -277,8 +277,11 @@ def v_wrf_view_alpha(request,token):
     else:
         client = token_verification['client']
         plan = token_verification['plan']
-        if plan == 'Premium':
+        if plan == 'Premium' or client == 'Kreate':
             site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
+            if client == "Kreate":
+                site_names = list(SiteConfig1.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
+            print(site_names)
             # api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
             api_date_start = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
             api_date_end = api_date_start + timedelta(days=3)
@@ -288,6 +291,7 @@ def v_wrf_view_alpha(request,token):
             data_serialize = VWrfRevisionSerializer(now_api,many=True)
             return Response(data_serialize.data)
         else:
+            print("This is a Premium Resource")
             return Response({'message':'This is a Premium Resource'})
     
 
@@ -307,7 +311,7 @@ def v_wrf_view_alph_site(request,token,site_name):
     else:
         client = token_verification['client']
         plan = token_verification['plan']
-        if plan == 'Premium':
+        if plan == 'Premium' or client == "Kreate":
             site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
             if site_name not in site_names:
                 return Response({'message':'Site Not available in Site List','site_list':site_names})

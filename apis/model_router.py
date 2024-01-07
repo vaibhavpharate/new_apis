@@ -1,4 +1,4 @@
-from .models import SiteConfig, VDbApi, VWrfData, VWrfRevision
+from .models import SiteConfig, VDbApi, VWrfData, VWrfRevision, SiteConfig1
 
 class MyDBRouter(object):
 
@@ -6,6 +6,8 @@ class MyDBRouter(object):
         """ reading SomeModel from otherdb """
         if model == SiteConfig:
             return 'site_configs'
+        elif model == SiteConfig1:
+            return 'site_configs_1'
         elif model == VDbApi:
             return 'data_api'
         elif model == VWrfData or model==VWrfRevision:
@@ -16,6 +18,8 @@ class MyDBRouter(object):
         """ writing SomeModel to otherdb """
         if model == SiteConfig:
             return 'site_configs'
+        elif model == SiteConfig1:
+            return 'site_configs_1'
         elif model == VDbApi:
             return 'data_api'
         elif model == VWrfData or model== VWrfRevision:
