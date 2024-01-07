@@ -313,6 +313,8 @@ def v_wrf_view_alph_site(request,token,site_name):
         plan = token_verification['plan']
         if plan == 'Premium' or client == "Kreate":
             site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
+            if client == "Kreate":
+                site_names = list(SiteConfig1.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
             if site_name not in site_names:
                 return Response({'message':'Site Not available in Site List','site_list':site_names})
             # api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
