@@ -33,7 +33,7 @@ class ClientAllSerializer(serializers.ModelSerializer):
 
 
 class VBADataSerializer(serializers.ModelSerializer):
-    timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:00")
 
     class Meta:
         model = VDbApi
@@ -41,14 +41,14 @@ class VBADataSerializer(serializers.ModelSerializer):
 
 
 class VWrfViewSerializer(serializers.ModelSerializer):
-    timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:00")
 
     class Meta:
         model = VWrfData
         fields = "__all__"
 
 class VWrfRevisionSerializer(serializers.ModelSerializer):
-    timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:00")
 
     class Meta:
         model = VWrfRevision
