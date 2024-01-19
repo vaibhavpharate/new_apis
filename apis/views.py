@@ -29,7 +29,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import ClientsForm, SiteConfigForm, ClientPlansForm
 
 # import models
-from .models import Clients, SiteConfig, Plans, ClientPlans, UserTokens, VDbApi, VWrfData, VWrfRevision, SiteConfig1
+from .models import Clients, SiteConfig, Plans, ClientPlans, UserTokens, VDbApi, VWrfData, VWrfRevision, SiteConfig1, ClientType
 from .serializers import ClientAllSerializer, VBADataSerializer, VWrfViewSerializer, VWrfRevisionSerializer
 
 
@@ -60,19 +60,10 @@ def admin_login(request):
 def admin_home(request):
     clients = Clients.objects.filter(role_type='CLIENT').prefetch_related('user_tokens')
     clients = ClientAllSerializer(clients, many=True).data
-    # clients = pd.DataFrame.from_records(clients)
-    # print(type(clients))
+    
     plans = Plans.objects.all().values()
     site_configs = SiteConfig.objects.all().values()
     client_plans = ClientPlans.objects.all().values()
-    
-    # client_sample_name = "Kreate"
-    # gte = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")
-    # client_sites_sample = list(SiteConfig.objects.filter(client_name=client_sample_name).values_list('site_name',flat=True))
-    # v_wrf_revision = VWrfData.objects.filter(site_name__in=client_sites_sample).filter(timestamp__gte=gte).values()
-    # print(v_wrf_revision)
-    # print(clients)
-
     context = {'clients': clients, 'sites': site_configs, 'plans': plans, 'client_plans': client_plans}
     return render(request=request, template_name='apis/admin_home.html', context=context)
 
@@ -108,6 +99,14 @@ def create_client(request):
                 valid_till = date_now + timedelta(days=validity)
                 user_token = UserTokens(client_id=user_id, valid_till=valid_till, user_token=tkn)
                 user_token.save()
+
+                # Save Client Type
+                # print()
+                cl_type = request.POST['client_type']
+                client = Clients.objects.get(id=user_id[0]['id'])
+                cl_type_obj = ClientType(client_id = client,cl_type = cl_type)
+                cl_type_obj.save()
+
                 token = tkn
             except Exception as e:
                 print(e)
@@ -149,7 +148,7 @@ def verify_token(token):
 
 
 def basic(client):
-    # ref_date = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+    
     ref_date = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
     api_date_start = ref_date + timedelta(days=1)
     api_date_end = ref_date + timedelta(days=3)
@@ -294,7 +293,36 @@ def v_wrf_view_alpha(request,token):
             print("This is a Premium Resource")
             return Response({'message':'This is a Premium Resource'})
     
-
+@api_view(['GET'])
+def v_wrf_alpha_file(request,token,file_name):
+    token_verification = verify_token(token=token)
+    message = token_verification['message']
+    # data = None
+    api_date_start = None
+    api_date_end = None
+    if token_verification['session_status'] != "Valid":
+        print("The Session is Invalid")
+        print(f"{message}")
+        return Response({'data':'Session is Invalid!S'})
+    else:
+        client = token_verification['client']
+        plan = token_verification['plan']
+        if plan == 'Premium' or client == 'Kreate':
+            site_names = list(SiteConfig.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
+            if client == "Kreate":
+                site_names = list(SiteConfig1.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
+            print(site_names)
+            # api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+            api_date_start = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+            api_date_end = api_date_start + timedelta(days=3)
+            now_api = VWrfRevision.objects.filter(site_name__in=site_names,
+                                                timestamp__gte=api_date_start,
+                                                timestamp__lte=api_date_end).values()
+            data_serialize = VWrfRevisionSerializer(now_api,many=True)
+            return Response(data_serialize.data)
+        else:
+            print("This is a Premium Resource")
+            return Response({'message':'This is a Premium Resource'})
 
 
 @api_view(['GET'])
@@ -317,7 +345,7 @@ def v_wrf_view_alph_site(request,token,site_name):
                 site_names = list(SiteConfig1.objects.filter(client_name=client).filter(site_status='Active').values_list('site_name', flat=True))
             if site_name not in site_names:
                 return Response({'message':'Site Not available in Site List','site_list':site_names})
-            # api_date_start = datetime.strptime(datetime.now().date().strftime("%Y-%m-%d 00:00:00"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
+            print(site_names)
             api_date_start = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"),"%Y-%m-%d %H:%M:%S")+ timedelta(hours=5,minutes=30)
             api_date_end = api_date_start + timedelta(days=3)
             now_api = VWrfRevision.objects.filter(site_name = site_name,

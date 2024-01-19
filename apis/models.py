@@ -12,6 +12,7 @@ class Plans(models.Model):
         return self.plan_type
 
 
+
 class Clients(AbstractUser):
     class Roles(models.TextChoices):
         ADMIN = "ADMIN", "Admin"
@@ -36,6 +37,18 @@ class Clients(AbstractUser):
     def __str__(self) -> str:
         return f"{self.username}"
 
+class ClientType(models.Model):
+
+    class TypeNames(models.TextChoices):
+        SOLAR = "SOLAR","Solar"
+        POWER = "POWER","Power"
+    
+    cl_type = models.CharField(max_length=200,choices=TypeNames.choices,default=TypeNames.SOLAR)
+    client_id = models.ForeignKey(Clients,on_delete=models.CASCADE,related_name='client_id')
+    date_added = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateField(auto_now=True)
+    
+    
 
 class ClientPlans(models.Model):
     client_id = models.ForeignKey(Clients, on_delete=models.CASCADE,related_name='client_plans')
@@ -167,7 +180,7 @@ class VWrfRevision(models.Model):
     swdown_wpm2 = models.FloatField(blank=True, null=True)
     swdown2_wpm2 = models.FloatField(blank=True, null=True)
     clearsky_wpm2 = models.FloatField(blank=True, null=True)
-    rain = models.FloatField(blank=True, null=True)
+    rain_mm = models.FloatField(blank=True, null=True)
     cloud_index = models.FloatField(blank=True, null=True)
 
     class Meta:

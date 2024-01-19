@@ -24,7 +24,7 @@ AUTH_USER_MODEL = 'apis.Clients'
 SECRET_KEY = 'django-insecure-$wvv-z=o((%sb1afa%7r0of%3d+j7%5$+rgs=spaf_zluytnyd'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['3.86.187.88','127.0.0.1','localhost']
 
@@ -89,8 +89,8 @@ DATABASES = {
         },
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'RkawhXAI88IjoLfaG5fN',
-        'HOST': 'tensordb.cc2d2xky8wfs.us-east-1.rds.amazonaws.com',
+        'PASSWORD': 'admin123',
+        'HOST': 'localhost',
         'PORT': '5432',
     },
     "site_configs": {
@@ -99,9 +99,9 @@ DATABASES = {
             'options': f'-c search_path=configs'
         },
         'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'RkawhXAI88IjoLfaG5fN',
-        'HOST': 'tensordb.cc2d2xky8wfs.us-east-1.rds.amazonaws.com',
+        'USER': 'admin123',
+        'PASSWORD': 'tensor123',
+        'HOST': 'tensordb1.cn6gzof6sqbw.us-east-2.rds.amazonaws.com',
         'PORT': '5432',
     },
     'site_configs_1':{

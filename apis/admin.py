@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 
 from django.contrib.auth import get_user_model
 
-from .models import Clients, Plans, ClientPlans, SiteConfig, VDbApi, UserTokens, VWrfData, VWrfRevision, SiteConfig1
+from .models import Clients, Plans, ClientPlans, SiteConfig, VDbApi, UserTokens, VWrfData, VWrfRevision, SiteConfig1, ClientType
 
 
 admin.site.register(get_user_model())
@@ -16,6 +16,8 @@ admin.site.register(VWrfData)
 admin.site.register(VWrfRevision)
 # SiteConfig1
 admin.site.register(SiteConfig1)
+admin.site.register(ClientType)
+
 
 
 
